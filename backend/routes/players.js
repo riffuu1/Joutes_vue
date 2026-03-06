@@ -14,9 +14,9 @@ router.get('/', async (req, res) => {
 
 
 
-router.get(':id', async (req, res) => {
+router.get('/:id', async (req, res) => {
     try {
-        const [rows] = await pool.execute('SELECT * FROM Players WHERE id = ?', [req.params.id]);
+        const [rows] = await pool.execute('SELECT * FROM Players WHERE idPlayers = ?', [req.params.id]);
         res.json(rows[0] || {message: "Non trouvé"});
     } catch (error) {
         console.error(error);
