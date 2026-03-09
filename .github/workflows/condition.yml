@@ -2,7 +2,7 @@ name: condition.yml
 on: push
 
 jobs:
-  mon-job:
+  ma-condition:
     runs-on: ubuntu-latest
 
     steps:
