@@ -1,0 +1,21 @@
+name: linter.yml
+on: push
+
+jobs:
+  linter-try:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Super-Linter
+        uses: super-linter/super-linter@v8.5.0
+
+      - name: Afficher le contenu du dossier
+        run: ls -la
+
+      - name: Executer le test
+            # Complétez la commande pour afficher le contenu de message.txt
+        run: node test.js
