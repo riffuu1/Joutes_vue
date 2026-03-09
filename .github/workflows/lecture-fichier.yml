@@ -13,4 +13,4 @@ jobs:
 
       - name: Lire le message
       # Complétez la commande pour afficher le contenu de message.txt
-        run: message.txt
+        run: cat message.txt
