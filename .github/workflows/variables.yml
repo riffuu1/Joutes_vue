@@ -1,5 +1,5 @@
 name: variables.yml
-on:
+on: push
 
 jobs:
   mon-job:
