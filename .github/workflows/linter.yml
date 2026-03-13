@@ -1,0 +1,32 @@
+name: linter
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  linter-try:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Super-Linter
+        uses: super-linter/super-linter@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_ALL_CODEBASE: true
+          VALIDATE_JAVASCRIPT_ES: true
+          VALIDATE_PYTHON: false
+          VALIDATE_PHP: false
+
+      - name: Afficher le contenu du dossier
+        run: ls -la
+
+      - name: Executer le test
+        run: |
+          cat message.txt
+          node test.js
