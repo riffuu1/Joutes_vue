@@ -10,7 +10,7 @@ Assure-toi d'avoir Node.js installé (version 18+ recommandée).
 
 git clone https://github.com/ton-pseudo/ton-projet.git
 
-cd ton-projet
+cd joutes-app
 
 **2. Installer les dépendances**
 
