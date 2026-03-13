@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../config/db');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'ma_cle_secrete_2plus2egale5';
 
@@ -17,8 +18,11 @@ router.post('/login', async (req, res) => {
 
         const user = users[0];
 
-        // LOGIQUE CRUE : Comparaison brute pour tes tests
-        if (password !== user.Password) {
+        // LOGIQUE SÉCURISÉE : Verification du hash
+        // On compare le mot de passe reçu avec le hash stocké en base
+        const isMatch = await bcrypt.compare(password, user.Password);
+
+        if (!isMatch) {
             return res.status(401).json({ message: "Mot de passe incorrect" });
         }
 
@@ -31,7 +35,7 @@ router.post('/login', async (req, res) => {
 
         res.json({
             message: "Connexion réussie",
-            token: token, // Le client devra renvoyer ce token
+            token: token,
             user: {
                 username: user.Username,
                 role: user.Role
