@@ -7,10 +7,14 @@ const user = reactive({
   firstname: "",
   classname: "",
   email: "",
-  team: ""
+  team: "",
+  sport: ""
 })
 
 const registered = ref(false)
+const loading = ref(false)
+
+const sports = ["Football", "Basket", "Tennis", "Natation"]
 
 const registerUser = async () => {
   if (
@@ -18,28 +22,36 @@ const registerUser = async () => {
     !user.firstname.trim() ||
     !user.classname.trim() ||
     !user.email.trim() ||
-    !user.team.trim()
+    !user.team.trim() ||
+    !user.sport.trim()
   ) {
     alert("Tous les champs sont requis.")
     return
   }
 
+  if (!user.email.includes("@")) {
+    alert("Email invalide")
+    return
+  }
+
+  loading.value = true
+
   try {
     await axios.post("/api/teams", { name: user.team })
 
-    await axios.post("/api/users", {
-      lastname: user.lastname,
-      firstname: user.firstname,
-      classname: user.classname,
-      email: user.email,
-      team: user.team
-    })
+    await axios.post("/api/users", user)
 
     registered.value = true
     alert(`Compte créé ! Bienvenue dans l'équipe ${user.team}.`)
+
+    // reset formulaire
+    Object.keys(user).forEach(key => user[key] = "")
+
   } catch (e) {
     console.error(e)
     alert("Erreur lors de l'inscription.")
+  } finally {
+    loading.value = false
   }
 }
 </script>
@@ -76,12 +88,26 @@ const registerUser = async () => {
         <input v-model="user.team" placeholder="Nom de votre équipe" />
       </div>
 
-      <button class="register-btn" @click="registerUser">
-        Créer mon compte
+      <div class="form-group">
+        <label>Choix du Sport</label>
+        <select v-model="user.sport">
+          <option disabled value="">Choisis un sport</option>
+          <option v-for="s in sports" :key="s" :value="s">
+            {{ s }}
+          </option>
+        </select>
+      </div>
+
+      <button
+        class="register-btn"
+        @click="registerUser"
+        :disabled="loading"
+      >
+        {{ loading ? "Chargement..." : "Créer mon compte" }}
       </button>
 
       <div v-if="registered" class="success-box">
-        Compte créé ! Équipe : <strong>{{ user.team }}</strong>
+        ✅ Compte créé ! Équipe : <strong>{{ user.team }}</strong>
       </div>
 
     </div>
@@ -89,14 +115,13 @@ const registerUser = async () => {
 </template>
 
 <style scoped>
-
 .register-container {
   position: fixed;
   inset: 0;
-
   display: flex;
   justify-content: center;
   align-items: center;
+  background: #f3f4f6;
 }
 
 .register-card {
@@ -129,13 +154,13 @@ label {
   font-weight: 500;
 }
 
-input {
+input, select {
   padding: 12px;
   border-radius: 8px;
   border: 1px solid #d1d5db;
 }
 
-input:focus {
+input:focus, select:focus {
   outline: none;
   border-color: #2563eb;
 }
@@ -156,12 +181,17 @@ input:focus {
   background: #1e4fd1;
 }
 
+.register-btn:disabled {
+  background: #93c5fd;
+  cursor: not-allowed;
+}
+
 .success-box {
   margin-top: 20px;
   padding: 12px;
-  background: #f1f5f9;
+  background: #dcfce7;
   border-radius: 8px;
   text-align: center;
+  color: #166534;
 }
-
 </style>
