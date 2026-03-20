@@ -47,4 +47,29 @@ router.post('/login', async (req, res) => {
     }
 });
 
+router.post('/register', async (req, res) => {
+    const { username, password, role, players_id } = req.body;
+
+    try {
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+        const sql = `INSERT INTO Users (Username, Password, Role, Players_id) VALUES (?, ?, ?, ?)`;
+        const [result] = await pool.execute(sql, [
+            username,
+            hashedPassword,
+            role || 'leader',
+            players_id || null
+        ]);
+
+        res.status(201).json({ message: "Utilisateur créé !", id: result.insertId });
+    } catch (error) {
+        console.error(error);
+        if (error.code === 'ER_DUP_ENTRY') {
+            return res.status(400).json({ message: "Ce nom d'utilisateur existe déjà" });
+        }
+        res.status(500).send("Erreur lors de l'inscription");
+    }
+});
+
 module.exports = router;
