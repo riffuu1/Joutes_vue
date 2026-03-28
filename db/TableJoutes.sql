@@ -94,20 +94,14 @@ CREATE TABLE IF NOT EXISTS `joutes`.`Sports_has_Teams` (
 
 DROP TABLE IF EXISTS `joutes`.`Users` ;
 
-CREATE TABLE IF NOT EXISTS `joutes`. `Users` (
-    `idUsers` INT NOT NULL AUTO_INCREMENT,
-    `Username` VARCHAR(25) NOT NULL,
-    `Password` VARCHAR(255) NOT NULL,
-    `Role` ENUM('admin', 'leader') NOT NULL DEFAULT 'leader',
-    `Players_id` INT NULL,
-    PRIMARY KEY (`idUsers`),
-    UNIQUE INDEX `Username_UNIQUE` (`Username` ASC),
-    CONSTRAINT `fk_Users_Players`
-    FOREIGN KEY (`Players_id`)
-    REFERENCES `joutes`.`Players` (`idPlayers`)
-    ON DELETE SET NULL
-    ON UPDATE NO ACTION
-    ) ENGINE = InnoDB;
+CREATE TABLE IF NOT EXISTS `joutes`.`Users` (
+  `idUsers` INT NOT NULL AUTO_INCREMENT,
+  `Username` VARCHAR(25) NOT NULL,
+  `Password` VARCHAR(255) NOT NULL,
+  `Role` ENUM('admin', 'leader') NOT NULL DEFAULT 'leader',
+  PRIMARY KEY (`idUsers`),
+  UNIQUE INDEX `Username_UNIQUE` (`Username` ASC)
+) ENGINE = InnoDB;
 
 
 
