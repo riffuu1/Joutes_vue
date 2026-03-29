@@ -1,8 +1,6 @@
 <template>
 
   <router-view />
-=======
-
 
   <RouterView />
 
@@ -22,6 +20,6 @@ body, html {
   margin: 0;
   padding: 0;
   max-width: none;
-  display: block; 
+  display: block;
 }
 </style>

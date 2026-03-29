@@ -5,10 +5,10 @@
         <button class="btn-nav btn-green">Vue Description</button>
         <button class="btn-nav btn-blue">Gestion Equipe</button>
       </div>
-      
+
       <div class="user-info">
         <div v-if="isAdmin" class="icon-shield">🛡️</div>
-        
+
         <div class="admin-text">
           <strong>{{ userDisplayName }}</strong><br>
           <span>{{ userRoleLabel }}</span>
@@ -21,7 +21,7 @@
     </header>
 
     <main class="content-container">
-      
+
       <div class="card">
         <div class="form-grid">
           <div class="form-group">
@@ -49,11 +49,11 @@
           <button v-if="isAdmin" class="btn btn-purple" @click="createPlayer">
             Ajouter joueur
           </button>
-          
+
           <button class="btn btn-green-alt" @click="handleSearch">
             Rechercher
           </button>
-          
+
           <button v-if="isAdmin" class="btn btn-red" @click="createInscription">
             Equipe Recherché
           </button>
@@ -121,7 +121,9 @@
 import { reactive, ref, onMounted, computed } from "vue"
 /* Importing Axios for future database requests */
 import axios from "axios"
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 /* Variable to control admin status (true = show all buttons, false = hide them) */
 const isAdmin = ref(true)
 /* Computed property to decide the name based on isAdmin */
@@ -131,7 +133,7 @@ const userRoleLabel = computed(() => isAdmin.value ? "Administrateur" : "Standar
 
 /* Reactive object to hold data for a new player */
 const player = reactive({
-  lastname: "", 
+  lastname: "",
   firstname: "",
   email: "",
   classname: "",
@@ -169,8 +171,13 @@ const createPlayer = async () => {
 /* Placeholder function for search logic */
 const handleSearch = () => alert("Recherche...")
 /* Placeholder function for logout logic */
-const handleLogout = () => alert("Déconnexion...")
+const handleLogout = () => {
+  // Nettoyage si besoin
+  localStorage.clear()
 
+  // Redirection vers login
+  router.replace('/login')
+}
 /* Trigger data loading when the component first appears on screen */
 onMounted(loadData)
 </script>
