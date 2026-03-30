@@ -1,49 +1,69 @@
 <template>
   <div class="login-container">
     <div class="login-card">
-
       <h1>Gestion des Équipes Sportives</h1>
       <p class="subtitle">Connectez-vous pour continuer</p>
 
       <div class="form-group">
-        <label>Email</label>
-        <input
-          type="email"
-          placeholder="votre.email@ecnv.ch"
-          v-model="email"
-        />
+        <label>Nom d'utilisateur</label>
+        <input type="text" placeholder="Entrez votre nom d'utilisateur" v-model="username" />
       </div>
 
       <div class="form-group">
         <label>Mot de passe</label>
-        <input
-          type="password"
-          placeholder="********"
-          v-model="password"
-        />
+        <input type="password" placeholder="********" v-model="password" />
       </div>
 
-      <button class="login-btn" @click="login">
-        Se connecter
-      </button>
-
+      <button class="login-btn" @click="login">Se connecter</button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue"
+import { ref } from 'vue'
+import axios from 'axios'
+import { useRouter } from 'vue-router'
 
-const email = ref("")
-const password = ref("")
+const router = useRouter()
+const username = ref('')
+const password = ref('')
+const loading = ref(false)
 
-const login = () => {
-  console.log(email.value, password.value)
+const login = async () => {
+  if (!username.value || !password.value) {
+    alert('Veuillez remplir tous les champs')
+    return
+  }
+
+  loading.value = true
+
+  try {
+    // Appelle API pour le login
+    const res = await axios.post('http://localhost:3006/api/auth/login',{
+      username: username.value,
+      password: password.value
+    })
+
+    // Si le serveur renvoye un token, on le stocke
+    if (res.data.token){
+      localStorage.setItem('token', res.data.token)
+    }
+
+    alert('Connexion réussie ! Bienvenue')
+
+
+    // Redirige vers la page d'accueil
+    router.push('/')
+  } catch (e) {
+    console.error(e)
+    alert(e.response?.data?.message || 'Identifiants incorrects.')
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 
 <style scoped>
-
 .login-container {
   position: fixed;
   inset: 0;
@@ -58,9 +78,8 @@ const login = () => {
   padding: 40px;
   border-radius: 12px;
   background: white;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
-
 
 h1 {
   font-size: 28px;
@@ -118,5 +137,4 @@ input:focus {
   font-size: 14px;
   text-align: left;
 }
-
 </style>

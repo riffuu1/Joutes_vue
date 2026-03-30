@@ -1,55 +1,106 @@
 <script setup>
-import { reactive, ref } from "vue"
-import axios from "axios"
+import { reactive, ref, onMounted } from 'vue'
+import axios from 'axios'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
+// Reactive object to store form input
 const user = reactive({
-  lastname: "",
-  firstname: "",
-  classname: "",
-  email: "",
-  team: "",
-  sport: ""
+  username: '',
+  password: '',
+  team: '',
+  sport: '', // stockera l'idSports sélectionné
 })
 
+// Track registration status and loading state
 const registered = ref(false)
 const loading = ref(false)
 
-const sports = ["Football", "Basket", "Tennis", "Natation"]
+const lastRegisteredTeam = ref('')
 
+// Sports récupérés depuis le backend
+const sports = ref([])
+
+// Récupération des sports depuis le backend
+onMounted(async () => {
+  try {
+    // Appel direct au backend sur le port 3006
+    const res = await axios.get('http://localhost:3006/api/sports')
+    sports.value = res.data // [{ idSports: 1, Name: "Badminton" }, ...]
+  } catch (e) {
+    console.error('Erreur récupération sports :', e)
+    alert('Impossible de récupérer les sports disponibles')
+  }
+})
+
+// Validation mot de passe strict
+function validatePassword(password) {
+  if (password.length < 12) return 'Le mot de passe doit contenir au moins 12 caractères'
+
+  const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])/
+  if (!regex.test(password))
+    return 'Le mot de passe doit contenir au moins une minuscule, une majuscule, un chiffre et un caractère spécial'
+
+  const lower = password.toLowerCase()
+  for (let i = 0; i < lower.length - 2; i++) {
+    if (
+      lower.charCodeAt(i) + 1 === lower.charCodeAt(i + 1) &&
+      lower.charCodeAt(i + 1) + 1 === lower.charCodeAt(i + 2)
+    ) {
+      return 'Le mot de passe ne peut pas contenir de suite de lettres comme abc'
+    }
+  }
+
+  for (let i = 0; i < password.length - 2; i++) {
+    const n1 = password[i].charCodeAt(0)
+    const n2 = password[i + 1].charCodeAt(0)
+    const n3 = password[i + 2].charCodeAt(0)
+    if (/\d/.test(password[i]) && /\d/.test(password[i + 1]) && /\d/.test(password[i + 2])) {
+      if (n1 + 1 === n2 && n2 + 1 === n3)
+        return 'Le mot de passe ne peut pas contenir de suite de chiffres comme 123'
+    }
+  }
+
+  return null
+}
+
+// Function to handle user registration
 const registerUser = async () => {
-  if (
-    !user.lastname.trim() ||
-    !user.firstname.trim() ||
-    !user.classname.trim() ||
-    !user.email.trim() ||
-    !user.team.trim() ||
-    !user.sport.trim()
-  ) {
-    alert("Tous les champs sont requis.")
+  if (!user.username.trim() || !user.password.trim() || !user.team.trim() || !user.sport) {
+    alert('Tous les champs sont obligatoires.')
     return
   }
 
-  if (!user.email.includes("@")) {
-    alert("Email invalide")
+  const passwordError = validatePassword(user.password)
+  if (passwordError) {
+    alert(passwordError)
     return
   }
 
   loading.value = true
 
   try {
-    await axios.post("/api/teams", { name: user.team })
+    await axios.post('http://localhost:3006/api/auth/register', {
+      username: user.username,
+      password: user.password,
+      teamName: user.team,
+      sportId: user.sport,
+    })
 
-    await axios.post("/api/users", user)
-
+    lastRegisteredTeam.value = user.team
     registered.value = true
-    alert(`Compte créé ! Bienvenue dans l'équipe ${user.team}.`)
+    alert(`Votre compte a été créé avec succès ! Bienvenue dans l'équipe ${user.team}.`)
 
-    // reset formulaire
-    Object.keys(user).forEach(key => user[key] = "")
+    //Redirection vers la page login
+    setTimeout(() => {
+      router.push('/login')
+    }, 2000)
 
+    // Reset form
+    Object.keys(user).forEach((key) => (user[key] = ''))
   } catch (e) {
     console.error(e)
-    alert("Erreur lors de l'inscription.")
+    alert(e.response?.data?.message || "Erreur lors de l'inscription.")
   } finally {
     loading.value = false
   }
@@ -59,57 +110,41 @@ const registerUser = async () => {
 <template>
   <div class="register-container">
     <div class="register-card">
-
-      <h1>Inscription Chef d'Équipe</h1>
-      <p class="subtitle">Créez votre équipe et commencez l'inscription</p>
+      <h1>Inscription des chefs d'équipe</h1>
+      <p class="subtitle">Créez votre équipe et commencez à vous inscrire</p>
 
       <div class="form-group">
-        <label>Nom</label>
-        <input v-model="user.lastname" placeholder="Votre nom" />
+        <label>Nom d'utilisateur</label>
+        <input v-model="user.username" placeholder="Entrez votre nom d'utilisateur" />
       </div>
 
       <div class="form-group">
-        <label>Prénom</label>
-        <input v-model="user.firstname" placeholder="Votre prénom" />
+        <label>Mot de passe</label>
+        <input type="password" v-model="user.password" placeholder="Mot de passe" />
       </div>
 
       <div class="form-group">
-        <label>Classe</label>
-        <input v-model="user.classname" placeholder="Ex: 3A" />
-      </div>
-
-      <div class="form-group">
-        <label>Email</label>
-        <input v-model="user.email" placeholder="votre.email@ecnv.ch" />
-      </div>
-
-      <div class="form-group">
-        <label>Nom de l'équipe</label>
-        <input v-model="user.team" placeholder="Nom de votre équipe" />
+        <label>Nom d'équipe</label>
+        <input v-model="user.team" placeholder="Votre nom d'équipe" />
       </div>
 
       <div class="form-group">
         <label>Choix du Sport</label>
         <select v-model="user.sport">
-          <option disabled value="">Choisis un sport</option>
-          <option v-for="s in sports" :key="s" :value="s">
-            {{ s }}
+          <option disabled value="">Choisissez un sport</option>
+          <option v-for="s in sports" :key="s.idSports" :value="s.idSports">
+            {{ s.Name }}
           </option>
         </select>
       </div>
 
-      <button
-        class="register-btn"
-        @click="registerUser"
-        :disabled="loading"
-      >
-        {{ loading ? "Chargement..." : "Créer mon compte" }}
+      <button class="register-btn" @click="registerUser" :disabled="loading">
+        {{ loading ? 'Chargement...' : 'Créer un compte' }}
       </button>
 
       <div v-if="registered" class="success-box">
-        ✅ Compte créé ! Équipe : <strong>{{ user.team }}</strong>
+        Votre compte a été créé avec succès ! Équipe: <strong>{{ lastRegisteredTeam }}</strong>
       </div>
-
     </div>
   </div>
 </template>
@@ -129,14 +164,13 @@ const registerUser = async () => {
   padding: 40px;
   border-radius: 12px;
   background: white;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
 h1 {
   text-align: center;
   margin-bottom: 5px;
 }
-
 .subtitle {
   text-align: center;
   color: #6b7280;
@@ -148,19 +182,18 @@ h1 {
   flex-direction: column;
   margin-bottom: 15px;
 }
-
 label {
   margin-bottom: 5px;
   font-weight: 500;
 }
-
-input, select {
+input,
+select {
   padding: 12px;
   border-radius: 8px;
   border: 1px solid #d1d5db;
 }
-
-input:focus, select:focus {
+input:focus,
+select:focus {
   outline: none;
   border-color: #2563eb;
 }
@@ -180,7 +213,6 @@ input:focus, select:focus {
 .register-btn:hover {
   background: #1e4fd1;
 }
-
 .register-btn:disabled {
   background: #93c5fd;
   cursor: not-allowed;
