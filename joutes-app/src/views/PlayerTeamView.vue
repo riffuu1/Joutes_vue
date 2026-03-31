@@ -47,7 +47,7 @@
 
         <div class="button-group">
           <button v-if="isAdmin" class="btn btn-purple" @click="createPlayer">
-            Ajouter joueur
+            Ajouter joueur 2
           </button>
 
           <button class="btn btn-green-alt" @click="handleSearch">
