@@ -116,11 +116,10 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 /* Importing reactive state and lifecycle hooks from Vue */
 import { reactive, ref, onMounted, computed } from "vue"
 /* Importing Axios for future database requests */
-import axios from "axios"
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -162,7 +161,7 @@ const createPlayer = async () => {
   try {
     /* Example: await axios.post("/api/players", player) */
     alert("Joueur créé !")
-  } catch (e) {
+  } catch  {
     /* Alert user if something goes wrong */
     alert("Erreur création")
   }
