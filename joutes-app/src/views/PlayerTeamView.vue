@@ -1,3 +1,94 @@
+<script setup lang="ts">
+import { reactive, ref, onMounted, computed } from 'vue'
+import axios from 'axios' // Importé pour les appels API
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+const isAdmin = ref(true)
+const userDisplayName = computed(() => (isAdmin.value ? 'Administrateur' : 'Utilisateur'))
+const userRoleLabel = computed(() => (isAdmin.value ? 'Administrateur' : 'Standard'))
+
+// 1. RECHERCHE EN TEMPS RÉEL
+const searchQuery = ref('')
+
+const player = reactive({
+  lastname: '',
+  firstname: '',
+  email: '',
+  classname: '',
+  team: '',
+})
+
+const teams = ref([])
+const playersList = ref([])
+
+// 2. CHARGEMENT DES DONNÉES DEPUIS TON BACKEND
+const loadData = async () => {
+  try {
+    // Récupère les équipes pour le select
+    const resTeams = await axios.get('http://localhost:3006/api/sports')
+    teams.value = resTeams.data.map((t) => t.Name)
+
+    // Récupère les joueurs pour la table
+    const resPlayers = await axios.get('http://localhost:3006/api/players')
+    playersList.value = resPlayers.data
+  } catch (e) {
+    console.error('Erreur chargement:', e)
+  }
+}
+
+// 3. LOGIQUE FILTRE (Recherche par prénom ou équipe)
+const filteredPlayers = computed(() => {
+  const query = searchQuery.value.toLowerCase()
+  return playersList.value.filter((p) => {
+    return p.firstname.toLowerCase().includes(query) || p.team.toLowerCase().includes(query)
+  })
+})
+
+// 4. CRÉATION DU JOUEUR (Validation email unique gérée par le serveur)
+const createPlayer = async () => {
+  if (!player.firstname || !player.lastname || !player.email || !player.team) {
+    alert('Veuillez remplir tous les champs obligatoires.')
+    return
+  }
+
+  try {
+    const res = await axios.post('http://localhost:3006/api/players', {
+      firstname: player.firstname,
+      lastname: player.lastname,
+      email: player.email,
+      classname: player.classname,
+      teamName: player.team,
+    })
+
+    playersList.value.push(res.data)
+
+    // Reset du formulaire SAUF l'équipe (plus pratique pour l'admin)
+    player.firstname = ''
+    player.lastname = ''
+    player.email = ''
+    player.classname = ''
+
+    alert('Joueur créé et assigné !')
+  } catch (e) {
+    alert(e.response?.data?.message || "Erreur : L'email doit être unique.")
+  }
+}
+
+// 5. BOUTON RECHERCHER (Optionnel car le filtre est déjà en temps réel)
+const handleSearch = () => {
+  if (!searchQuery.value)
+    alert('Entrez un nom dans la barre de recherche (ou utilisez le filtre en direct)')
+}
+
+const handleLogout = () => {
+  localStorage.clear()
+  router.replace('/login')
+}
+
+onMounted(loadData)
+</script>
+
 <template>
   <div class="page-bg">
     <header class="navbar">
@@ -29,6 +120,10 @@
             <input v-model="player.firstname" type="text" placeholder="Entrez le prénom" />
           </div>
           <div class="form-group">
+            <label>Nom</label>
+            <input v-model="player.lastname" type="text" placeholder="Entrez le nom" />
+          </div>
+          <div class="form-group">
             <label>Email</label>
             <input v-model="player.email" type="email" placeholder="exemple@mail.com" />
           </div>
@@ -55,6 +150,14 @@
           <button v-if="isAdmin" class="btn btn-red">Equipe Recherché</button>
         </div>
 
+        <div class="form-group" style="margin-top: 10px">
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Tapez ici pour filtrer la table en temps réel..."
+          />
+        </div>
+
         <div class="helper-section">
           <p class="italic">
             Entrez pour ajouter une nouvelle équipe ou seuris déclencher une équipe existante
@@ -77,7 +180,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="p in playersList" :key="p.id">
+            <tr v-for="p in filteredPlayers" :key="p.id">
               <td>{{ p.id }}</td>
               <td>{{ p.lastname }}</td>
               <td>{{ p.firstname }}</td>
@@ -89,11 +192,8 @@
                 <button class="btn-delete">Supprimer</button>
               </td>
             </tr>
-            <tr v-if="playersList.length === 0">
-              <td colspan="7" class="empty-msg">
-                Aucun joueur trouvé. La table se remplira automatiquement après la connexion à la
-                DB.
-              </td>
+            <tr v-if="filteredPlayers.length === 0">
+              <td colspan="7" class="empty-msg">Aucun joueur trouvé.</td>
             </tr>
           </tbody>
         </table>
@@ -116,72 +216,6 @@
     </main>
   </div>
 </template>
-
-<script setup lang="ts">
-/* Importing reactive state and lifecycle hooks from Vue */
-import { reactive, ref, onMounted, computed } from 'vue'
-/* Importing Axios for future database requests */
-import { useRouter } from 'vue-router'
-
-const router = useRouter()
-/* Variable to control admin status (true = show all buttons, false = hide them) */
-const isAdmin = ref(true)
-/* Computed property to decide the name based on isAdmin */
-const userDisplayName = computed(() => (isAdmin.value ? 'Administrateur' : 'Utilisateur'))
-/* Computed property to decide the role sub-text */
-const userRoleLabel = computed(() => (isAdmin.value ? 'Administrateur' : 'Standard'))
-
-/* Reactive object to hold data for a new player */
-const player = reactive({
-  lastname: '',
-  firstname: '',
-  email: '',
-  classname: '',
-  team: '',
-})
-
-/* Ref array to store teams fetched from the DB */
-const teams = ref(['Les Buens Ritmos', 'Paradis', 'Hesta la Vista'])
-/* Ref array to store players (will stay empty until you connect your DB) */
-const playersList = ref([])
-
-/* Async function to load teams and players from your API */
-const loadData = async () => {
-  try {
-    /* Example: const res = await axios.get("/api/players") */
-    /* Example: playersList.value = res.data */
-    console.log('Prêt pour la connexion DB')
-  } catch (e) {
-    /* Log errors if the API call fails */
-    console.error('Erreur chargement:', e)
-  }
-}
-
-/* Function to handle creating a new player via API */
-const createPlayer = async () => {
-  try {
-    /* Example: await axios.post("/api/players", player) */
-    alert('Joueur créé !')
-  } catch {
-    /* Alert user if something goes wrong */
-    alert('Erreur création')
-  }
-}
-
-/* Placeholder function for search logic */
-const handleSearch = () => alert('Recherche...')
-/* Placeholder function for logout logic */
-const handleLogout = () => {
-  // Nettoyage si besoin
-  localStorage.clear()
-
-  // Redirection vers login
-  router.replace('/login')
-}
-/* Trigger data loading when the component first appears on screen */
-onMounted(loadData)
-</script>
-
 <style scoped>
 /* Reset and base styles for the whole page */
 .page-bg {
