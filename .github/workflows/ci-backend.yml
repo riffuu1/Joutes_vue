@@ -1,0 +1,17 @@
+name: CI - Backend Check
+on: [push]
+
+jobs:
+  backend-security:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install
+      - name: Security Audit
+        run: npm audit --audit-level=high # Vérifie les failles de sécurité
