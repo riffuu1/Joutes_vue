@@ -1,0 +1,32 @@
+name: CD - Deploy Frontend to GH Pages
+
+on:
+  push:
+    branches: [ "main" ] # Se lance quand tu merges sur main
+
+permissions:
+  contents: write # Autorise GitHub à créer la branche de déploiement
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install & Build
+        run: |
+          cd joutes-app
+          npm install
+          npm run build
+        # Note : Vite génère le dossier 'dist'
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./joutes-app/dist # Le chemin vers tes fichiers compilés
