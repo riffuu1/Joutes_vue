@@ -1,6 +1,8 @@
 # Gestion de Joutes - Application Web
 Ce projet est une application fullstack permettant de gérer des joutes. Il utilise un backend Node.js et un frontend React (joutes-app), avec une base de données MySQL gérée via HeidiSQL.
 
+
+**Voir wiki pour modification de branche**
 # Installation 
 **Prérequis**
 
