@@ -1,33 +1,81 @@
-# Joutes_vue
+# Gestion de Joutes - Application Web
+Ce projet est une application fullstack permettant de gérer des joutes. Il utilise un backend Node.js et un frontend React (joutes-app), avec une base de données MySQL gérée via HeidiSQL.
 
-# Installation et Lancement
+# Installation 
 **Prérequis**
 
-Assure-toi d'avoir Node.js installé (version 18+ recommandée).
+Avant de commencer, assurez-vous d'avoir installé :
+
+- Node.js (version LTS recommandée)
+
+- HeidiSQL ou un autre gestionnaire de base de données MySQL.
+
+**Installation de la Base de Données**
+
+1. Ouvrez HeidiSQL et connectez-vous à votre instance locale.
+
+2. Créez une nouvelle base de données (ex: joutes_db).
+
+3. Chargez et exécutez les fichiers SQL       dans l'ordre suivant :
+
+- TableJoutes.sql (Structure de la base)
+
+- insertion.sql (Données initiales)
+
+
+
+# Configuration et Lancement
 
 **1. Cloner le projet**
 
+git clone https://github.com/riffuu1/Joutes_vue.git
 
-git clone https://github.com/ton-pseudo/ton-projet.git
+Le projet est divisé en deux parties. Vous devrez ouvrir deux terminaux distincts.
 
+**2. Configuration du Backend**
+
+```bash 
+# Accéder au dossier backend
+cd backend
+# Installation des dépendances
+npm install
+npm install dotenv
+```
+
+**Configuration de l'environnement**
+- Copiez le fichier .env.example et Collez-le au même endroit puis renommez-le en .env
+
+- Ouvrez le fichier .env et ajouter la variable suivante pour autoriser le CORS :
+**FRONTEND_URL= http://localhost:5173**
+
+
+**Démarrage**
+
+```bash 
+node index.js
+```
+
+**3. Configuration du Frontend**
+```bash 
+# Accéder au dossier frontend
 cd joutes-app
-
-**2. Installer les dépendances**
-
+# Installation des dépendances
 npm install
 npm install axios
+```
 
-**3. Configurer l'environnement**
+**Démarrage**
 
-Copier l'exemple .env et rentrer vos données.
-
-**Lancer en mode développement**
-
+```bash 
 npm run dev
+```
 
 
-Role Admin:
-l'admin pourrait gèrer tous les utilisateurs,modifier les paramètres globaux.
+# Utilisation 
+Une fois les deux serveurs lancés :
 
-Role Chef d'équipe/user:
-le chef d'équipe qui sera connecté en tant qu'user pourra créer et Modifier son équipe et aussi ajoute des joueurs
+Le frontend est généralement accessible sur : http://localhost:5173
+
+Le backend tourne sur le port configuré : 3006.
+
+
