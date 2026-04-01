@@ -19,7 +19,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
@@ -53,7 +53,7 @@ const login = async () => {
 
 
     // Redirige vers la page d'accueil
-    router.push('/')
+    router.push('/teams')
   } catch (e) {
     console.error(e)
     alert(e.response?.data?.message || 'Identifiants incorrects.')

@@ -54,7 +54,7 @@
             Rechercher
           </button>
 
-          <button v-if="isAdmin" class="btn btn-red" @click="createInscription">
+          <button v-if="isAdmin" class="btn btn-red">
             Equipe Recherché
           </button>
         </div>
@@ -87,8 +87,8 @@
               <td>{{ p.classname }}</td>
               <td>{{ p.team }}</td>
               <td v-if="isAdmin" class="action-buttons">
-                <button class="btn-edit" @click="editPlayer(p.id)">Modifier</button>
-                <button class="btn-delete" @click="deletePlayer(p.id)">Supprimer</button>
+                <button class="btn-edit">Modifier</button>
+                <button class="btn-delete">Supprimer</button>
               </td>
             </tr>
             <tr v-if="playersList.length === 0">
@@ -100,7 +100,7 @@
         <div v-if="isAdmin" class="bulk-actions">
           <div class="bulk-left">
             <span>Actions groupées:</span>
-            <button class="btn-delete-selection" @click="deleteSelected">Supprimer Sélection</button>
+            <button class="btn-delete-selection">Supprimer Sélection</button>
           </div>
           <div class="bulk-right">
             <span>Changer équipe pour la sélection</span>
@@ -108,7 +108,7 @@
               <option>Sélectionner...</option>
               <option v-for="t in teams" :key="t">{{ t }}</option>
             </select>
-            <button class="btn-apply" @click="applyBulkChange">Appliquer</button>
+            <button class="btn-apply">Appliquer</button>
           </div>
         </div>
       </div>
@@ -116,11 +116,10 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 /* Importing reactive state and lifecycle hooks from Vue */
 import { reactive, ref, onMounted, computed } from "vue"
 /* Importing Axios for future database requests */
-import axios from "axios"
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -162,7 +161,7 @@ const createPlayer = async () => {
   try {
     /* Example: await axios.post("/api/players", player) */
     alert("Joueur créé !")
-  } catch (e) {
+  } catch  {
     /* Alert user if something goes wrong */
     alert("Erreur création")
   }
