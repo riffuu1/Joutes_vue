@@ -135,7 +135,8 @@ const createPlayer = async () => {
     player.team = ''
 
     alert('Joueur créé et assigné à l\'équipe !')
-  } catch (e: any) {
+  } catch (// eslint-disable-next-line @typescript-eslint/no-explicit-any
+  e: any) {
     console.error('Create error:', e)
     alert(e.response?.data?.message || "Erreur lors de la création")
   }
@@ -162,7 +163,8 @@ const deletePlayer = async (playerId: number) => {
     allPlayers.value = allPlayers.value.filter((p: any) => p.id !== playerId)
     
     alert('Joueur supprimé')
-  } catch (e: any) {
+  } catch (// eslint-disable-next-line @typescript-eslint/no-explicit-any 
+  e: any) {
     console.error('Delete error:', e)
     alert(e.response?.data?.message || "Erreur lors de la suppression")
   }

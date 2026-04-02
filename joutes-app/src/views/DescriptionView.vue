@@ -52,7 +52,7 @@ const getCurrentUserId = () => {
             return user[field]
           }
         }
-      } catch (e) {
+      } catch {
         continue
       }
     }
@@ -120,7 +120,8 @@ const addTeamSport = async () => {
     newEntry.value.teamName = ''
     newEntry.value.sportName = ''
     alert("L'équipe a été créée et liée au sport avec succès.")
-  } catch (e: any) {
+  } catch (// eslint-disable-next-line @typescript-eslint/no-explicit-any
+  e: any) {
     console.error('Add error:', e.response?.data || e.message)
     alert(e.response?.data?.message || "Erreur lors de l'ajout.")
   }
@@ -185,7 +186,8 @@ const saveEdit = async () => {
     await loadSports()
     closeEditModal()
     alert("Les modifications ont été enregistrées avec succès.")
-  } catch (e: any) {
+  } catch (// eslint-disable-next-line @typescript-eslint/no-explicit-any
+  e: any) {
     console.error('EDIT ERROR:', e.response?.data || e.message)
     alert('Erreur: ' + (e.response?.data?.message || e.message))
   }
@@ -205,7 +207,8 @@ const deleteEntry = async (item: any) => {
     try {
       await axios.delete(`http://localhost:3006/api/sports/${item.idT}/${item.idS}`)
       await loadSports()
-    } catch (e: any) {
+    } catch (// eslint-disable-next-line @typescript-eslint/no-explicit-any
+    e: any) {
       console.error('Delete error:', e.response?.data || e.message)
       alert("Erreur: L'équipe ne peut pas être supprimée (elle contient probablement des joueurs).")
     }
