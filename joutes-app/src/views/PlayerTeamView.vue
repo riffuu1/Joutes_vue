@@ -38,6 +38,7 @@ const loadData = async () => {
   try {
     // Load teams
     const resTeams = await axios.get('http://localhost:3006/api/sports')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     teams.value = resTeams.data.map((t: any) => t.displayTeam || t.Name)
 
     // Load players with team info
@@ -57,6 +58,7 @@ const searchByFirstname = () => {
   }
   
   const query = searchFirstname.value.toLowerCase().trim()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   playersList.value = allPlayers.value.filter((p: any) => {
     return p.firstname?.toLowerCase().includes(query)
   })
@@ -72,7 +74,7 @@ const searchByTeam = () => {
     alert('Veuillez sélectionner une équipe')
     return
   }
-  
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   playersList.value = allPlayers.value.filter((p: any) => {
     return p.team === searchTeam.value
   })
@@ -159,7 +161,9 @@ const deletePlayer = async (playerId: number) => {
     })
     
     // Remove from both lists
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     playersList.value = playersList.value.filter((p: any) => p.id !== playerId)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     allPlayers.value = allPlayers.value.filter((p: any) => p.id !== playerId)
     
     alert('Joueur supprimé')

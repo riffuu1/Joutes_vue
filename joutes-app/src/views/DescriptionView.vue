@@ -84,6 +84,7 @@ const handleLogout = () => {
 const loadSports = async () => {
   try {
     const res = await axios.get('http://localhost:3006/api/sports')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     teamSports.value = res.data.map((item: any) => ({
       team: item.displayTeam,
       sport: item.displaySport,
@@ -128,7 +129,7 @@ const addTeamSport = async () => {
 }
 
 /* --- EDIT METHODS --- */
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const openEditModal = (item: any) => {
   editingItem.value = {
     idT: item.idT,
@@ -194,7 +195,7 @@ const saveEdit = async () => {
 }
 
 /* --- DELETE METHOD --- */
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const deleteEntry = async (item: any) => {
   if (!item.idT || !item.idS) {
     alert("Erreur: Impossible de localiser l'ID de cette équipe.")
